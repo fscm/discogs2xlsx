@@ -1,0 +1,32 @@
+# Project
+*.test
+*.json
+*.dat
+*.xlsx
+venv/*
+!.gitkeep
+
+# Python
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info
+build/
+dist/
+out/
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+
+# Windows
+Desktop.ini
+Thumbs.db
+
