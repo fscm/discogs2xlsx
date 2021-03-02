@@ -6,8 +6,14 @@
 
 """Global variables."""
 
-__author__: str = 'Frederico Martins'
-__author_email__: str = 'fscm@users.noreply.github.com'
-__license__: str = 'MIT'
-__project__: str = __package__
-__version__: str = '0.1.0'
+from typing import Final
+
+
+__author__: Final[str] = 'Frederico Martins'
+__author_email__: Final[str] = 'fscm@users.noreply.github.com'
+__license__: Final[str] = 'MIT'
+__project__: Final[str] = __package__
+__version__: Final[str] = '0.2.0'
+
+DEFAULT_FILE_COLLECTION: Final[str] = 'discogs-collection.xlsx'
+DEFAULT_FILE_WANTLIST: Final[str] = 'discogs-wantlist.xlsx'

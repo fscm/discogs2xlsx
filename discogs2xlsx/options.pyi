@@ -1,38 +1,24 @@
 import argparse
-from . import __project__ as __project__
+from . import __project__, __version__
+from . import DEFAULT_FILE_COLLECTION, DEFAULT_FILE_WANTLIST
 from typing import Any, Optional
+
+ArgumentParser = argparse.ArgumentParser
+MutuallyExclusiveGroup: argparse._MutuallyExclusiveGroup
+Namespace = argparse.Namespace
 
 
 class _WantlistAction(argparse.Action):
-    def __init__(
+    def __call__(
         self,
-        option_strings: Any,
-        dest: Any,
-        default: bool = ...,
-        required: bool = ...,
-        help: Optional[Any] = ...,
-        metavar: Optional[Any] = ...) -> None: ...
-    def __call__(self, parser: Any, namespace: Any, values: Any,
-                 option_string: Optional[Any] = ...) -> None: ...
+        parser: ArgumentParser,
+        amespace: Namespace,
+        values: list[str],
+        option_string: Optional[str] = ...) -> None: ...
 
 
 class Options:
     def __init__(self) -> None: ...
+    def __setattr__(self, name: Any, value: Any) -> None: ...
     @property
-    def apikey(self) -> str: ...
-    @property
-    def currency(self) -> str: ...
-    @property
-    def debug(self) -> bool: ...
-    @property
-    def details(self) -> bool: ...
-    @property
-    def file(self) -> str: ...
-    @property
-    def options(self) -> dict[str, Any]: ...
-    @property
-    def prices(self) -> bool: ...
-    @property
-    def quiet(self) -> bool: ...
-    @property
-    def wantlist(self) -> bool: ...
+    def all(self) -> dict[str, Any]: ...

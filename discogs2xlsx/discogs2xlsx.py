@@ -37,31 +37,33 @@ class Discogs2Xlsx:
 
     def main(self) -> None:
         """main method"""
-        options = Options()
+        options: Options = Options()
         # pylint: disable=repeated-keyword
-        logger = Logger(
-            **({'level': Logger.Level.NONE} if options.quiet else {}),
-            **({'level': Logger.Level.DEBUG} if options.debug else {}))
+        logger: Logger = Logger(
+            **({'level': Logger.Level.NONE} if options.all['quiet'] else {}),
+            **({'level': Logger.Level.DEBUG} if options.all['debug'] else {}))
         # pylint: enable=repeated-keyword
-        if not options.quiet:
+        if not options.all['quiet']:
             print(self.__header)
-        discogs = Discogs(
-            key=options.apikey,
-            currency=options.currency,
+        discogs: Discogs = Discogs(
+            key=options.all['apikey'],
+            currency=options.all['currency'],
             logger=logger)
-        xlsx = Xlsx(logger=logger)
-        if options.wantlist:
+        xlsx: Xlsx = Xlsx(logger=logger)
+        if options.all['wantlist']:
             wantlist = discogs.get_wantlist(
-                details=options.details,
-                prices=options.prices)
-            xlsx.save_wantlist(wantlist=wantlist, to_file=options.file)
+                details=options.all['details'],
+                prices=options.all['prices'])
+            xlsx.save_wantlist(wantlist=wantlist, to_file=options.all['file'])
         else:
             collection = discogs.get_collection(
-                details=options.details,
-                prices=options.prices)
-            xlsx.save_collection(collection=collection, to_file=options.file)
+                details=options.all['details'],
+                prices=options.all['prices'])
+            xlsx.save_collection(
+                collection=collection,
+                to_file=options.all['file'])
 
 
 def main() -> None:
-    d2x = Discogs2Xlsx()
+    d2x: Discogs2Xlsx = Discogs2Xlsx()
     d2x.main()

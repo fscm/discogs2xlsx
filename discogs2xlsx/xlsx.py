@@ -21,9 +21,17 @@ All other classes in this module are considered implementation details.
 """
 
 from datetime import datetime
+from typing import Any, Optional, TYPE_CHECKING
 from progress.bar import Bar
 import xlsxwriter
 from . import __project__, __version__
+
+if TYPE_CHECKING:
+    from .logger import Logger
+
+# type aliases
+Workbook = xlsxwriter.workbook.Workbook
+Worksheet = xlsxwriter.worksheet.Worksheet
 
 
 class Xlsx:
@@ -36,10 +44,14 @@ class Xlsx:
         None.
     """
 
-    def __init__(self, logger=None):
+    def __init__(self, logger: Optional['Logger'] = None) -> None:
         self.__logger = logger
 
-    def _populate_worksheet(self, workbook, worksheet, data):
+    def _populate_worksheet(
+            self,
+            workbook: Workbook,
+            worksheet: Worksheet,
+            data: dict[str, Any]) -> None:
         """Populates a worksheet with the info.
 
         Args:
@@ -190,7 +202,10 @@ class Xlsx:
                         cell_format=worksheet_format_default)
                 worksheet_row += 1
 
-    def save_collection(self, collection, to_file):
+    def save_collection(
+            self,
+            collection: dict[str, Any],
+            to_file: str) -> None:
         """Writes the collection information to a file.
 
         Args:
@@ -210,7 +225,7 @@ class Xlsx:
         self._populate_worksheet(workbook, worksheet, collection)
         workbook.close()
 
-    def save_wantlist(self, wantlist, to_file):
+    def save_wantlist(self, wantlist: dict[str, Any], to_file: str) -> None:
         """Writes the wantlist information to a file.
 
         Args:

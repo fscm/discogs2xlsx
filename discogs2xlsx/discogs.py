@@ -24,9 +24,17 @@ All other classes in this module are considered implementation details.
 import json
 import re
 from time import time, sleep
+from typing import Any, Final, Optional, TYPE_CHECKING
 from progress.bar import Bar
 from requests import sessions
 from . import __project__
+
+if TYPE_CHECKING:
+    from requests.models import Response
+    from .logger import Logger
+
+# type aliases
+Session = sessions.Session
 
 
 class Discogs:
@@ -36,34 +44,44 @@ class Discogs:
 
     Args:
       key (str): Discogs API key.
-      currency (str): Currency for prices (one of 'AUD' 'BRL' 'CAD'
-        'CHF' 'EUR' 'GBP' 'JPY' 'MXN' 'NZD' 'SEK' 'USD' 'ZAR').
+      currency (str, optional): Currency for prices (one of 'AUD' 'BRL'
+        'CAD' 'CHF' 'EUR' 'GBP' 'JPY' 'MXN' 'NZD' 'SEK' 'USD' 'ZAR').
         Defaults to 'EUR'.
       logger (logger.Logger, optional): Logger to use. Defaults to
       None.
     """
 
-    API_BASEURL = 'https://api.discogs.com'
-    API_FORMAT = 'application/vnd.discogs.v2.plaintext+json'
-    API_LIMIT = 100
-    API_RATELIMIT_STATUS = 429
-    API_RATELIMIT_TIME = 61
+    API_BASEURL: Final[str] = 'https://api.discogs.com'
+    API_FORMAT: Final[str] = 'application/vnd.discogs.v2.plaintext+json'
+    API_LIMIT: Final[int] = 100
+    API_RATELIMIT_STATUS: Final[int] = 429
+    API_RATELIMIT_TIME: Final[int] = 61
 
-    def __init__(self, key, currency='EUR', logger=None):
-        self.__api_last_block_time = time()
-        self.__headers = {
+    def __init__(
+            self,
+            key: str,
+            currency: Optional[str] = 'EUR',
+            logger: Optional['Logger'] = None) -> None:
+        self.__api_last_block_time: float = time()
+        self.__headers: dict[str, Any] = {
             'Accept': f'{self.API_FORMAT}',
             'Accept-Encoding': 'gzip',
             'Content-Type': 'application/json',
             'User-Agent': f'{__project__}'}
-        self.__key = key
-        self.__currency = currency
-        self.__logger = logger
-        self.__params = {'token': f'{self.__key}', 'per_page': self.API_LIMIT}
-        self.__session = sessions.Session()
-        self.__identity = self.__request(f'{self.API_BASEURL}/oauth/identity')
+        self.__key: str = key
+        self.__currency: str = currency
+        self.__logger: 'Logger' = logger
+        self.__params: dict[str, Any] = {
+            'token': f'{self.__key}',
+            'per_page': self.API_LIMIT}
+        self.__session: Session = sessions.Session()
+        self.__identity: dict[str, Any] = self.__request(
+            f'{self.API_BASEURL}/oauth/identity')
 
-    def __request(self, url, params=None):
+    def __request(
+            self,
+            url: str,
+            params: Optional[dict[str, Any]] = None) -> dict[str, Any]:
         """Private method to perform a request to the Discogs API.
 
         Args:
@@ -74,15 +92,15 @@ class Discogs:
         Returns:
           dict[str, Any]: Discogs API data.
         """
-        response = self.__session.get(
+        response: 'Response' = self.__session.get(
             url,
             params={
                 **self.__params,
                 **params} if params else self.__params,
             headers=self.__headers)
-        headers = response.headers
-        status_code = response.status_code
-        remaining_queries = int(
+        headers: dict[str, Any] = response.headers
+        status_code: int = response.status_code
+        remaining_queries: int = int(
             headers.get(
                 'X-Discogs-Ratelimit-Remaining',
                 60))
@@ -90,15 +108,18 @@ class Discogs:
                 status_code == self.API_RATELIMIT_STATUS):
             if self.__logger:
                 self.__logger.debug('API rate limit reacehd.')
-            now = time()
+            now: float = time()
             sleep(max(
                 2,
                 self.API_RATELIMIT_TIME - (now - self.__api_last_block_time)))
-            self.__api_last_block_time = now
+            self.__api_last_block_time: float = now
             return self.__request(url=url, params=params)
         return json.loads(response.content)
 
-    def get_collection(self, details=False, prices=False):
+    def get_collection(
+            self,
+            details: Optional[bool] = False,
+            prices: Optional[bool] = False) -> dict[str, Any]:
         """Fetch Discogs albums from the user's collection.
 
         Args:
@@ -112,13 +133,13 @@ class Discogs:
         """
         if self.__logger:
             self.__logger.info('Fetching Discogs collection.')
-        collection = {}
-        collection_info = self.__request(
+        collection: dict[str, Any] = {}
+        collection_info: dict[str, Any] = self.__request(
             url=f'{self.__identity["resource_url"]}/collection/folders/0',
             params={'page': 1})
-        albums = int(collection_info.get('count', 0))
-        pages = -(-albums // self.API_LIMIT) + 1
-        show_progress = True
+        albums: int = int(collection_info.get('count', 0))
+        pages: int = -(-albums // self.API_LIMIT) + 1
+        show_progress: bool = True
         if self.__logger and self.__logger.level < self.__logger.Level.INFO:
             show_progress = False
         for page in Bar('Collection').iter(
@@ -169,7 +190,6 @@ class Discogs:
                 collection[r_artist][r_instance_id].setdefault(
                     'thumb', release['basic_information']['thumb'])
                 collection[r_artist][r_instance_id].setdefault('url', r_url)
-
                 if details:
                     r_details = self.__request(
                         url=f'{r_url}',
@@ -218,11 +238,11 @@ class Discogs:
         """
         if self.__logger:
             self.__logger.info('Fetching Discogs wantlist.')
-        wantlist = {}
-        wantlist_info = self.__request(
+        wantlist: dict[str, Any] = {}
+        wantlist_info: dict[str, Any] = self.__request(
             url=f'{self.__identity["resource_url"]}/wants')
-        pages = int(wantlist_info['pagination'].get('pages', 0)) + 1
-        show_progress = True
+        pages: int = int(wantlist_info['pagination'].get('pages', 0)) + 1
+        show_progress: bool = True
         if self.__logger and self.__logger.level < self.__logger.Level.INFO:
             show_progress = False
         for page in Bar('Wantlist  ').iter(

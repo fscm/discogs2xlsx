@@ -14,7 +14,7 @@ class Logger:
 
     def __init__(
         self,
-        level: Level = ...,
+        level: Optional[Level] = ...,
         file: Optional[str] = ...) -> None: ...
 
     @property

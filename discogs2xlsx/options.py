@@ -23,12 +23,15 @@ All other classes in this module are considered implementation details.
 """
 
 import argparse
-from os import getcwd
+from typing import Any, Optional
 from . import __project__, __version__
+from . import DEFAULT_FILE_COLLECTION, DEFAULT_FILE_WANTLIST
 
-
-_default_file_collection = f'{getcwd()}/discogs-collection.xlsx'
-_default_file_wantlist = f'{getcwd()}/discogs-wantlist.xlsx'
+# type aliases
+ArgumentParser = argparse.ArgumentParser
+MutuallyExclusiveGroup = (
+    argparse._MutuallyExclusiveGroup) # pylint: disable=protected-access
+Namespace = argparse.Namespace
 
 
 class _WantlistAction(argparse.Action):
@@ -36,45 +39,17 @@ class _WantlistAction(argparse.Action):
 
     This class extends argparse.Action to define the default file name
     for the wantlist option.
-
-    Args:
-      option_strings (str): The option string that was used to invoke
-        this action.
-      dest (str): The name of the attribute to be added to the object.
-      default (bool): The value produced if the argument is absent from
-        the command line and if it is absent from the namespace object.
-      required (bool): Whether or not the command-line option may be
-        omitted
-      help (str): A brief description of what the argument does.
-      metavar (str): A name for the argument in usage messages.
     """
 
-    def __init__(
+    def __call__(
             self,
-            option_strings,
-            dest,
-            default=False,
-            required=False,
-            help=None,  # pylint: disable=redefined-builtin
-            metavar=None):
-        super().__init__(
-            option_strings=option_strings,
-            dest=dest,
-            nargs=0,
-            const=True,
-            default=default,
-            required=required,
-            help=help)
-
-    def __call__(self, parser, namespace, values, option_string=None):
+            parser: ArgumentParser,
+            namespace: Namespace,
+            values: list[str],
+            option_string: Optional[str] = None) -> None:
         setattr(namespace, self.dest, self.const)
-        default_file = getattr(namespace, 'file')
-        if default_file == _default_file_collection:
-            try:
-                default_file = _default_file_wantlist
-            except TypeError:
-                pass
-            setattr(namespace, 'file', default_file)
+        if getattr(namespace, 'file') == DEFAULT_FILE_COLLECTION:
+            setattr(namespace, 'file', DEFAULT_FILE_WANTLIST)
 
 
 class Options:
@@ -84,16 +59,14 @@ class Options:
     the command-line options.
     """
 
-    __default_file = _default_file_collection
-
-    def __init__(self):
-        parser = argparse.ArgumentParser(
+    def __init__(self) -> None:
+        parser: ArgumentParser = argparse.ArgumentParser(
             prog=__project__,
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             add_help=True,
             allow_abbrev=False)
-        mutually_exclusive = parser.add_mutually_exclusive_group(
-            required=False)
+        mutually_exclusive: MutuallyExclusiveGroup = \
+            parser.add_mutually_exclusive_group(required=False)
         parser.add_argument(
             '-a',
             '--apikey',
@@ -107,7 +80,7 @@ class Options:
             '--currency',
             action='store',
             nargs=1,
-            default=['EUR'],
+            default='EUR',
             type=str,
             choices=[
                 'AUD',
@@ -137,7 +110,7 @@ class Options:
             '--file',
             action='store',
             nargs=1,
-            default=self.__default_file,
+            default=DEFAULT_FILE_COLLECTION,
             type=str,
             help='output file name')
         parser.add_argument(
@@ -158,59 +131,25 @@ class Options:
         parser.add_argument(
             '-w',
             '--wantlist',
-            # action='store_true',
             action=_WantlistAction,
+            nargs=0,
+            const=True,
+            default=False,
             help='exports the wantlist instead of the collection')
-        self.__options = parser.parse_args()
+        self.__args: dict[str, Any] = parser.parse_args()
+        self.__all: dict[str, Any] = {
+            k: (v[0] if isinstance(v, list) and not isinstance(
+                v, str) else v) for (k, v) in vars(self.__args).items()}
+        for k, v in self.__all.items():
+            setattr(self, k, v)
+
+    def __setattr__(self, name: Any, value: Any) -> None:
+        if name in self.__dict__:
+            raise SyntaxError('cannot assign to operator')
+            #raise AttributeError('cannot assign to operator')
+        self.__dict__[name] = value
 
     @property
-    def apikey(self):
-        """str: apikey option."""
-        return self.__options.apikey[0]
-
-    @property
-    def currency(self):
-        """str: currency option."""
-        return self.__options.currency[0]
-
-    @property
-    def debug(self):
-        """bool: debug option."""
-        return self.__options.debug
-
-    @property
-    def details(self):
-        """bool: exports extra details option."""
-        return self.__options.details
-
-    @property
-    def file(self):
-        """str: data file option."""
-        return self.__options.file
-
-    @property
-    def options(self):
+    def all(self) -> dict[str, Any]:
         """dict: all options."""
-        return {
-            key: (
-                value[0] if isinstance(
-                    value,
-                    list) else value) for (
-                key,
-                value) in vars(
-                self.__options).items()}
-
-    @property
-    def prices(self):
-        """bool: exports recommended prices option."""
-        return self.__options.prices
-
-    @property
-    def quiet(self):
-        """bool: quiet option."""
-        return self.__options.quiet
-
-    @property
-    def wantlist(self):
-        """bool: export wantlist instead of collection option."""
-        return self.__options.wantlist
+        return self.__all

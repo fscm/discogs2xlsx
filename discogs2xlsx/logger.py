@@ -23,6 +23,7 @@ All other classes in this module are considered implementation details.
 import logging
 from enum import IntEnum, unique
 from sys import stdout
+from typing import Optional
 from . import __project__
 
 
@@ -43,34 +44,39 @@ class Logger:
         Args:
           Enum (int): Verbosiy level.
         """
-        DEBUG = logging.DEBUG
-        INFO = logging.INFO
-        WARNING = logging.WARNING
-        ERROR = logging.ERROR
-        CRITICAL = logging.CRITICAL
-        NONE = logging.NOTSET
+        DEBUG: int = logging.DEBUG
+        INFO: int = logging.INFO
+        WARNING: int = logging.WARNING
+        ERROR: int = logging.ERROR
+        CRITICAL: int = logging.CRITICAL
+        NONE: int = logging.NOTSET
 
-    def __init__(self, level=Level.INFO, file=None):
-        self.__file = file
-        self.__level = level
-        self.__formatter = logging.Formatter('[%(levelname)-8s] %(message)s')
-        self.__console = logging.StreamHandler(self.__file or stdout)
+    def __init__(
+            self,
+            level: Optional[Level] = Level.INFO,
+            file: Optional[str] = None):
+        self.__file: str = file
+        self.__level: Logger.Level = level
+        self.__formatter: logging.Formatter = logging.Formatter(
+            '[%(levelname)-8s] %(message)s')
+        self.__console: logging.StreamHandler = logging.StreamHandler(
+            self.__file or stdout)
         self.__console.setFormatter(self.__formatter)
-        self.__logger = logging.getLogger(f'{__project__}')
+        self.__logger: logging.Logger = logging.getLogger(f'{__project__}')
         self.__logger.setLevel(self.__level.value)
         self.__logger.addHandler(self.__console)
 
     @property
-    def file(self):
+    def file(self) -> str:
         """str: log file option."""
         return self.__file
 
     @property
-    def level(self):
+    def level(self) -> Level:
         """Level: log level option."""
         return self.__level
 
-    def critical(self, msg):
+    def critical(self, msg: str) -> None:
         """Logs a 'msg % args' message with level 'CRITICAL' on this
         logger.
 
@@ -79,7 +85,7 @@ class Logger:
         """
         self.__logger.critical(msg)
 
-    def debug(self, msg):
+    def debug(self, msg: str) -> None:
         """Logs a 'msg % args' message with level 'DEBUG' on this
         logger.
 
@@ -88,7 +94,7 @@ class Logger:
         """
         self.__logger.debug(msg)
 
-    def error(self, msg):
+    def error(self, msg: str) -> None:
         """Logs a 'msg % args' message with level 'ERROR' on this
         logger.
 
@@ -97,7 +103,7 @@ class Logger:
         """
         self.__logger.error(msg)
 
-    def info(self, msg):
+    def info(self, msg: str) -> None:
         """Logs a 'msg % args' message with level 'INFO' on this
         logger.
 
@@ -106,7 +112,7 @@ class Logger:
         """
         self.__logger.info(msg)
 
-    def warning(self, msg):
+    def warning(self, msg: str) -> None:
         """Logs a 'msg % args' message with level 'WARNING' on this
         logger.
 
