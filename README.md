@@ -29,13 +29,13 @@ if you do not have one already.
 A Discogs personal token is also required. You can obtain one at
 [https://www.discogs.com/settings/developers](https://www.discogs.com/settings/developers)
 
-For price recommendations (`--price` option) the
+For price recommendations (`--prices` option) the
 [Discogs Seller Settings](https://www.discogs.com/settings/seller/) are
 required.
 
 ### Python 3.x
 
-Python version 3.6 or above is required for the tool to work. Python setup can
+Python version 3.8 or above is required for the tool to work. Python setup can
 be found [here](https://www.python.org/downloads/).
 
 The following python modules are also required to run the tool:
@@ -48,20 +48,21 @@ The following python modules are also required to run the tool:
 
 The simplest way to install this tool is using pip:
 
-```
+```shell
 pip3 install discogs2xlsx
 ```
 
 ## Usage
 
 A simple example of how to use this tool:
-```
+
+```shell
 discogs2xlsx -a my_discogs_secret_token
 ```
 
 List of all the options:
 
-```
+```shell
 usage: discogs2xlsx [-h] -a APIKEY [-c {AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}] [--debug] [-d] [-f FILE] [-p] [-q] [-v] [-w]
 
 optional arguments:
@@ -94,27 +95,27 @@ this project.
 
 A Virtual Environment can be created using the follow command:
 
-```
+```shell
 python3 -m venv venv/
 ```
 
 After creating the Virtual Environment the same will have to be activated, run
 the following command to do that:
 
-```
+```shell
 source venv/bin/activate
 ```
 
 To build and run the tool some Python modules are required. These modules can
 be installed using the following command:
 
-```
+```shell
 pip3 --quiet install --upgrade --requirement requirements.txt build
 ```
 
 Finaly the Python package for this tool can be created with the command:
 
-```
+```shell
 python3 -m build --wheel
 ```
 
@@ -123,7 +124,7 @@ After this you should endup with a wheel file (`*.whl`) inside a folder called
 
 The tool can be install using the wheel file and pip3:
 
-```
+```shell
 pip3 --quiet install dist/discogs2xlsx-*.whl
 ```
 

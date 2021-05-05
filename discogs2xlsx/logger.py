@@ -6,16 +6,17 @@
 
 """Logger module.
 
-This module is based on the logging library.
+This module is based on the `logging` library.
 
 The following is a simple usage example::
-  from .logger import Logger
-  l = Logger(level=Logger.Level.DEBUG)
-  l.info('my log entry')
+
+    >>> from .logger import Logger
+    >>> l = Logger(level=Logger.Level.DEBUG)
+    >>> l.info('my log entry')
 
 The module contains the following public classes:
-  - Logger -- The main entry point for logging. As the example above
-    shows, the Logger() class is used to take care of the logs.
+    - Logger -- The main entry point for logging. As the example above
+        shows, the Logger() class is used to take care of the logs.
 
 All other classes in this module are considered implementation details.
 """
@@ -30,11 +31,11 @@ from . import __project__
 class Logger:
     """logger.
 
-    This class uses the logging.Logger class to manage the logs.
+    This class uses the `logging.Logger` class to manage the logs.
 
     Args:
-      level (Level, optional): Logging level. Defaults to Level.INFO.
-      file (str, optional): Log file. Defaults to None.
+        level (Level, optional): Logging level. Defaults to Level.INFO.
+        file (str, optional): Log file. Defaults to None.
     """
 
     @unique
@@ -42,7 +43,7 @@ class Logger:
         """Logger verbosity levels.
 
         Args:
-          Enum (int): Verbosiy level.
+            Enum (int): Verbosiy level.
         """
         DEBUG: int = logging.DEBUG
         INFO: int = logging.INFO
@@ -55,14 +56,12 @@ class Logger:
             self,
             level: Optional[Level] = Level.INFO,
             file: Optional[str] = None):
-        self.__file: str = file
-        self.__level: Logger.Level = level
-        self.__formatter: logging.Formatter = logging.Formatter(
-            '[%(levelname)-8s] %(message)s')
-        self.__console: logging.StreamHandler = logging.StreamHandler(
-            self.__file or stdout)
+        self.__file = file
+        self.__level = level
+        self.__formatter = logging.Formatter('[%(levelname)-8s] %(message)s')
+        self.__console = logging.StreamHandler(self.__file or stdout)
         self.__console.setFormatter(self.__formatter)
-        self.__logger: logging.Logger = logging.getLogger(f'{__project__}')
+        self.__logger = logging.getLogger(__project__)
         self.__logger.setLevel(self.__level.value)
         self.__logger.addHandler(self.__console)
 
@@ -81,7 +80,7 @@ class Logger:
         logger.
 
         Args:
-          msg (str): Log message.
+            msg (str): Log message.
         """
         self.__logger.critical(msg)
 
@@ -90,7 +89,7 @@ class Logger:
         logger.
 
         Args:
-          msg (str): Log message.
+            msg (str): Log message.
         """
         self.__logger.debug(msg)
 
@@ -99,7 +98,7 @@ class Logger:
         logger.
 
         Args:
-          msg (str): Log message.
+            msg (str): Log message.
         """
         self.__logger.error(msg)
 
@@ -108,7 +107,7 @@ class Logger:
         logger.
 
         Args:
-          msg (str): Log message.
+            msg (str): Log message.
         """
         self.__logger.info(msg)
 
@@ -117,6 +116,6 @@ class Logger:
         logger.
 
         Args:
-          msg (str): Log message.
+            msg (str): Log message.
         """
         self.__logger.warning(msg)

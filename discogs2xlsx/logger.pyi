@@ -1,7 +1,5 @@
-from . import __project__ as __project__
 from enum import IntEnum
 from typing import Optional
-
 
 class Logger:
     class Level(IntEnum):
@@ -11,12 +9,7 @@ class Logger:
         ERROR: int = ...
         CRITICAL: int = ...
         NONE: int = ...
-
-    def __init__(
-        self,
-        level: Optional[Level] = ...,
-        file: Optional[str] = ...) -> None: ...
-
+    def __init__(self, level: Optional[Level]=..., file: Optional[str]=...) -> None: ...
     @property
     def file(self) -> str: ...
     @property

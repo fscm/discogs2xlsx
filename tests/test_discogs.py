@@ -25,8 +25,11 @@ def test_discogs_ok_default(mocker):
         'username': 'dummy',
         'resource_url': 'https://api.discogs.com/users/dummy',
         'consumer_name': 'dummy'}
+    # mocker.patch(
+    #     'discogs2xlsx.discogs.Discogs._Discogs__request',
+    #     return_value=response)
     mocker.patch(
-        'discogs2xlsx.discogs.Discogs._Discogs__request',
+        'discogs2xlsx.discogs.Discogs.DiscogsRequests.request',
         return_value=response)
     d = Discogs(key='dummy')
     assert isinstance(d, Discogs)
@@ -152,35 +155,40 @@ def test_discogs_ok_collection(mocker):
         'Fair (F)': {'currency': 'EUR', 'value': 2.58},
         'Poor (P)': {'currency': 'EUR', 'value': 1.29}}
     result = {
-        'Dead Can Dance': {
-            382774613: {
-                'album': 'Dionysus',
-                'year': 2018,
-                'id': 12736525,
-                'format': 'VINYL',
-                'format_qty': '1',
-                'instance_id': 382774613,
-                'catno': 'PIASR440LP',
-                'styles': 'Modern Classical, Downtempo, New Age',
-                'thumb': 'https://img.discogs.com/dummy.jpg',
-                'url': 'https://api.discogs.com/releases/12736525',
-                'have': 2533,
-                'want': 323,
-                'uri': 'https://www.discogs.com/Dead-Can-Dance-Dionysus/release/12736525',
-                'notes': '℗ 2018 Dead Can Dance\n© 2018 Dead Can Dance.',
-                'num_for_sale': 153,
-                'lowest_price': '14.46',
-                'prices': {
-                    'mint': '24.43',
-                    'near_mint': '21.86',
-                    'very_good_plus': '16.71',
-                    'very_good': '11.57',
-                    'good_plus': '6.43',
-                    'good': '3.86',
-                    'fair': '2.58',
-                    'poor': '1.29'}}}}
+        'username': 'dummy',
+        'collection': {
+            'Dead Can Dance': {
+                382774613: {
+                    'album': 'Dionysus',
+                    'year': 2018,
+                    'id': 12736525,
+                    'format': 'VINYL',
+                    'quantity': '1',
+                    'instance_id': 382774613,
+                    'catno': 'PIASR440LP',
+                    'styles': 'Modern Classical, Downtempo, New Age',
+                    'url': 'https://api.discogs.com/releases/12736525',
+                    'have': 2533,
+                    'want': 323,
+                    'uri': 'https://www.discogs.com/Dead-Can-Dance-Dionysus/release/12736525',
+                    'notes': '℗ 2018 Dead Can Dance\n© 2018 Dead Can Dance.',
+                    'num_for_sale': 153,
+                    'lowest_price': '14.46',
+                    'prices': {
+                        'mint': '24.43',
+                        'near_mint': '21.86',
+                        'very_good_plus': '16.71',
+                        'very_good': '11.57',
+                        'good_plus': '6.43',
+                        'good': '3.86',
+                        'fair': '2.58',
+                        'poor': '1.29'}}}}}
+    # mocker.patch(
+    #     'discogs2xlsx.discogs.Discogs._Discogs__request',
+    #     side_effect=[
+    #         response_0, response_1, response_2, response_3, response_4])
     mocker.patch(
-        'discogs2xlsx.discogs.Discogs._Discogs__request',
+        'discogs2xlsx.discogs.Discogs.DiscogsRequests.request',
         side_effect=[
             response_0, response_1, response_2, response_3, response_4])
     l = Logger(level=Logger.Level.NONE)
@@ -307,34 +315,40 @@ def test_discogs_ok_wantlist(mocker):
         'Fair (F)': {'currency': 'EUR', 'value': 2.87},
         'Poor (P)': {'currency': 'EUR', 'value': 1.44}}
     result = {
-        'The Obsessed': {
-            3099920: {
-                'album': 'Lunar Womb',
-                'year': 2006,
-                'id': 3099920,
-                'format': 'VINYL',
-                'format_qty': '1',
-                'catno': 'SPIN:004',
-                'styles': 'Stoner Rock, Doom Metal, Heavy Metal',
-                'thumb': 'https://img.discogs.com/dummy.jpg',
-                'url': 'https://api.discogs.com/releases/3099920',
-                'have': 73,
-                'want': 120,
-                'uri': 'https://www.discogs.com/The-Obsessed-Lunar-Womb/release/3099920',
-                'notes': 'Pressing Info:\r\n\r\n1000 Black\r\n300 Red\r\n',
-                'num_for_sale': 1,
-                'lowest_price': '60.00',
-                'prices': {
-                    'mint': '27.31',
-                    'near_mint': '24.44',
-                    'very_good_plus': '18.69',
-                    'very_good': '12.94',
-                    'good_plus': '7.19',
-                    'good': '4.31',
-                    'fair': '2.87',
-                    'poor': '1.44'}}}}
+        'username': 'dummy',
+        'wantlist': {
+            'The Obsessed': {
+                3099920: {
+                    'album': 'Lunar Womb',
+                    'year': 2006,
+                    'id': 3099920,
+                    'instance_id': 3099920,
+                    'format': 'VINYL',
+                    'quantity': '1',
+                    'catno': 'SPIN:004',
+                    'styles': 'Stoner Rock, Doom Metal, Heavy Metal',
+                    'url': 'https://api.discogs.com/releases/3099920',
+                    'have': 73,
+                    'want': 120,
+                    'uri': 'https://www.discogs.com/The-Obsessed-Lunar-Womb/release/3099920',
+                    'notes': 'Pressing Info:\r\n\r\n1000 Black\r\n300 Red\r\n',
+                    'num_for_sale': 1,
+                    'lowest_price': '60.00',
+                    'prices': {
+                        'mint': '27.31',
+                        'near_mint': '24.44',
+                        'very_good_plus': '18.69',
+                        'very_good': '12.94',
+                        'good_plus': '7.19',
+                        'good': '4.31',
+                        'fair': '2.87',
+                        'poor': '1.44'}}}}}
+    # mocker.patch(
+    #     'discogs2xlsx.discogs.Discogs._Discogs__request',
+    #     side_effect=[
+    #         response_0, response_1, response_1, response_2, response_3])
     mocker.patch(
-        'discogs2xlsx.discogs.Discogs._Discogs__request',
+        'discogs2xlsx.discogs.Discogs.DiscogsRequests.request',
         side_effect=[
             response_0, response_1, response_1, response_2, response_3])
     l = Logger(level=Logger.Level.NONE)

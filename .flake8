@@ -6,6 +6,7 @@ exclude =
     venv
 filename = *.py
 format = pylint
+indent-size = 4
 max-line-length = 79
 max-complexity = 10
 max-doc-length = 72

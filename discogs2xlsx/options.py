@@ -6,38 +6,38 @@
 
 """Command-line parsing module.
 
-This module is based on the argparse command-line parsing library.
+This module is based on the `argparse` command-line parsing library.
 
 The following is a simple usage example::
-  from .options import Options
-  o = Options()
-  for opt in o.options:
-      print(opt, o.options[opt], type(o.options[opt]))
+
+    >>> from .options import Options
+    >>> o = Options()
+    >>> for opt in o.all:
+    ...     print(opt, o.all[opt], type(o.all[opt]))
 
 The module contains the following public classes:
-  - Options -- The main entry point for command-line parsing. As the
-    example above shows, the Options() class is used to parse the
-    arguments.
+    - Options -- The main entry point for command-line parsing. As the
+        example above shows, the Options() class is used to parse the
+        arguments.
 
 All other classes in this module are considered implementation details.
 """
 
-import argparse
+#import argparse
+from argparse import (
+    Action,
+    ArgumentDefaultsHelpFormatter,
+    ArgumentParser,
+    Namespace)
 from typing import Any, Optional
 from . import __project__, __version__
 from . import DEFAULT_FILE_COLLECTION, DEFAULT_FILE_WANTLIST
 
-# type aliases
-ArgumentParser = argparse.ArgumentParser
-MutuallyExclusiveGroup = (
-    argparse._MutuallyExclusiveGroup) # pylint: disable=protected-access
-Namespace = argparse.Namespace
 
-
-class _WantlistAction(argparse.Action):
+class _WantlistAction(Action):
     """Wantlist option action.
 
-    This class extends argparse.Action to define the default file name
+    This class extends `argparse.Action` to define the default file name
     for the wantlist option.
     """
 
@@ -55,17 +55,17 @@ class _WantlistAction(argparse.Action):
 class Options:
     """Command-line options parser.
 
-    This class uses the argparse.ArgumentParser to parse and validate
+    This class uses the `argparse.ArgumentParser` to parse and validate
     the command-line options.
     """
 
     def __init__(self) -> None:
-        parser: ArgumentParser = argparse.ArgumentParser(
+        parser = ArgumentParser(
             prog=__project__,
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            formatter_class=ArgumentDefaultsHelpFormatter,
             add_help=True,
             allow_abbrev=False)
-        mutually_exclusive: MutuallyExclusiveGroup = \
+        mutually_exclusive = \
             parser.add_mutually_exclusive_group(required=False)
         parser.add_argument(
             '-a',
@@ -136,8 +136,8 @@ class Options:
             const=True,
             default=False,
             help='exports the wantlist instead of the collection')
-        self.__args: dict[str, Any] = parser.parse_args()
-        self.__all: dict[str, Any] = {
+        self.__args = parser.parse_args()
+        self.__all = {
             k: (v[0] if isinstance(v, list) and not isinstance(
                 v, str) else v) for (k, v) in vars(self.__args).items()}
         for k, v in self.__all.items():
@@ -146,7 +146,6 @@ class Options:
     def __setattr__(self, name: Any, value: Any) -> None:
         if name in self.__dict__:
             raise SyntaxError('cannot assign to operator')
-            #raise AttributeError('cannot assign to operator')
         self.__dict__[name] = value
 
     @property

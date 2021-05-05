@@ -9,9 +9,10 @@
 This module allows for data to be writen into xlsx files.
 
 The following is a simple usage example::
-  from .xlsx import Xlsx
-  x = Xlsx()
-  x.save_collection({}, 'my_collection.xlsx')
+
+  >>> from .xlsx import Xlsx
+  >>> x = Xlsx()
+  >>> x.save_collection({}, 'my_collection.xlsx')
 
 The module contains the following public classes:
   - Xlsx -- The main entry point. As the example above shows, the
@@ -21,17 +22,10 @@ All other classes in this module are considered implementation details.
 """
 
 from datetime import datetime
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 from progress.bar import Bar
 import xlsxwriter
 from . import __project__, __version__
-
-if TYPE_CHECKING:
-    from .logger import Logger
-
-# type aliases
-Workbook = xlsxwriter.workbook.Workbook
-Worksheet = xlsxwriter.worksheet.Worksheet
 
 
 class Xlsx:
@@ -49,8 +43,8 @@ class Xlsx:
 
     def _populate_worksheet(
             self,
-            workbook: Workbook,
-            worksheet: Worksheet,
+            workbook: xlsxwriter.workbook.Workbook,
+            worksheet: xlsxwriter.worksheet.Worksheet,
             data: dict[str, Any]) -> None:
         """Populates a worksheet with the info.
 
@@ -63,6 +57,8 @@ class Xlsx:
         """
 
         worksheet_format_bold = workbook.add_format({'bold': True})
+        # worksheet_format_currency = workbook.add_format(
+        #     {'num_format': f'{self.__symbol}# ##0;-{self.__symbol}# ##0'})
         worksheet_format_default = workbook.add_format(
             {'align': 'left', 'valign': 'vcenter'})
         worksheet_format_link = workbook.add_format(
@@ -92,13 +88,7 @@ class Xlsx:
         worksheet.write_row(0, 0, worksheet_rows, worksheet_format_bold)
         worksheet.freeze_panes(1, 0)
         worksheet_row = 1
-        show_progress = True
-        if self.__logger and self.__logger.level < self.__logger.Level.INFO:
-            show_progress = False
-        for artist in Bar('Collection').iter(
-                sorted(
-                    data.keys())) if show_progress else sorted(
-                data.keys()):
+        for artist in Bar('Writing   ').iter(sorted(data.keys())):
             for release in data[artist].keys():
                 worksheet.set_row(worksheet_row, 25)
                 worksheet.write_string(
@@ -124,7 +114,7 @@ class Xlsx:
                 worksheet.write_string(
                     worksheet_row,
                     5,
-                    data[artist][release]['format_qty'],
+                    data[artist][release]['quantity'],
                     cell_format=worksheet_format_default)
                 worksheet.write_string(
                     worksheet_row,
@@ -201,6 +191,8 @@ class Xlsx:
                         data[artist][release]['album'],
                         cell_format=worksheet_format_default)
                 worksheet_row += 1
+        if self.__logger:
+            self.__logger.info('Data saved.')
 
     def save_collection(
             self,
@@ -213,16 +205,16 @@ class Xlsx:
           to_file (str): file to write to.
         """
         if self.__logger:
-            self.__logger.info(f'Saving data to "{to_file}"')
+            self.__logger.info(f'Saving data to "{to_file}".')
         workbook = xlsxwriter.Workbook(to_file, {'constant_memory': True})
         workbook.set_properties({
             'title': 'Discogs Collection',
-            'subject': 'User collection',
+            'subject': f'{collection["username"]} collection',
             'author': __project__,
             'created': datetime.utcnow().replace(microsecond=0),
             'comments': f'Created with {__project__} version {__version__}'})
         worksheet = workbook.add_worksheet('collection')
-        self._populate_worksheet(workbook, worksheet, collection)
+        self._populate_worksheet(workbook, worksheet, collection['collection'])
         workbook.close()
 
     def save_wantlist(self, wantlist: dict[str, Any], to_file: str) -> None:
@@ -233,14 +225,14 @@ class Xlsx:
           to_file (str): file to write to.
         """
         if self.__logger:
-            self.__logger.info(f'Saving data to "{to_file}"')
+            self.__logger.info(f'Saving data to "{to_file}".')
         workbook = xlsxwriter.Workbook(to_file, {'constant_memory': True})
         workbook.set_properties({
             'title': 'Discogs Wantlist',
-            'subject': 'User wantlist',
+            'subject': f'{wantlist["username"]} wantlist',
             'author': __project__,
             'created': datetime.utcnow().replace(microsecond=0),
             'comments': f'Created with {__project__} version {__version__}'})
         worksheet = workbook.add_worksheet('wantlist')
-        self._populate_worksheet(workbook, worksheet, wantlist)
+        self._populate_worksheet(workbook, worksheet, wantlist['wantlist'])
         workbook.close()

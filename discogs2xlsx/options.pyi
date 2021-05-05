@@ -1,21 +1,8 @@
-import argparse
-from . import __project__, __version__
-from . import DEFAULT_FILE_COLLECTION, DEFAULT_FILE_WANTLIST
+from argparse import Action, ArgumentParser, Namespace
 from typing import Any, Optional
 
-ArgumentParser = argparse.ArgumentParser
-MutuallyExclusiveGroup: argparse._MutuallyExclusiveGroup
-Namespace = argparse.Namespace
-
-
-class _WantlistAction(argparse.Action):
-    def __call__(
-        self,
-        parser: ArgumentParser,
-        amespace: Namespace,
-        values: list[str],
-        option_string: Optional[str] = ...) -> None: ...
-
+class _WantlistAction(Action):
+    def __call__(self, parser: ArgumentParser, namespace: Namespace, values: list[str], option_string: Optional[str]=...) -> None: ...
 
 class Options:
     def __init__(self) -> None: ...

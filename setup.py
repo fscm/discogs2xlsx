@@ -7,26 +7,28 @@
 
 """Setup discogs2xlsx."""
 
-import os
+#import os
 from setuptools import setup
 from discogs2xlsx import (
-    __author__, __author_email__, __license__, __project__, __version__)
+    __author__, __license__, __project__, __version__)
 
 if __name__ == '__main__':
     setup(
         author=__author__,
-        author_email=__author_email__,
         classifiers=[
             'Development Status :: 4 - Beta',
             'Environment :: Console',
             'Intended Audience :: End Users/Desktop',
             'License :: OSI Approved :: MIT License',
             'Operating System :: OS Independent',
-            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.8',
             'Topic :: Utilities',
             'Typing :: Typed'],
         description=(
             'Exports your Discogs collection or wantlist into a xlsx file'),
+        entry_points={
+            'console_scripts': [
+                f'{__project__} = {__project__}.__main__:main']},
         install_requires=[
             'progress>=1.5',
             'requests>=2.25.1',
@@ -37,7 +39,6 @@ if __name__ == '__main__':
         name=__project__,
         packages=[__project__],
         package_data={'': ['LICENSE'], __project__: ['py.typed', '*.pyi']},
-        python_requires='~=3.6',
+        python_requires='~=3.8',
         url='https://github.com/fscm/discogs2xlsx',
-        version=__version__,
-        scripts=['bin/' + __project__ + '.bat' if os.name == 'nt' else 'bin/' + __project__])
+        version=__version__)
