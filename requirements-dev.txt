@@ -1,0 +1,9 @@
+autopep8
+build
+mypy
+pdoc3
+pylint
+pytest
+pytest-cov
+pytest-mock
+twine
