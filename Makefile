@@ -69,7 +69,7 @@ clean-cache:
 # -- clean dev                                                   clean dev ----
 clean-dev:
 	@echo "Deleting the 'venv'..."
-	@rm -rf "$(PROJECT_DIR)"/venv/*
+	@rm -rf "$(VENV_DIR)"/*
 ifdef VIRTUAL_ENV
 	@echo
 	@echo "!! Python venv active. !!"
@@ -102,7 +102,7 @@ $(VENV_DIR)/bin/activate: $(PROJECT_DIR)/$(REQUIREMENTS)
 # -- dev                                                               dev ----
 dev: $(VENV_DIR)/bin/activate
 	@echo "Adding the project to Python libs..."
-	@echo "$(PROJECT_DIR)/src" > "$(PYTHON_LIBS)/$(PACKAGE_NAME).pth"
+	@echo "$(SOURCE_DIR)" > "$(PYTHON_LIBS)/$(PACKAGE_NAME).pth"
 
 # -- dev-upgrade                                               dev-upgrade ----
 dev-upgrade:
