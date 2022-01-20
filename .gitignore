@@ -3,7 +3,7 @@
 *.json
 *.dat
 *.xlsx
-venv/*
+.venv/*
 !.gitkeep
 
 # Python
