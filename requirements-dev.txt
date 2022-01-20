@@ -1,5 +1,7 @@
 autopep8
 build
+coverage
+flake8
 mypy
 pdoc3
 pylint
@@ -7,3 +9,4 @@ pytest
 pytest-cov
 pytest-mock
 twine
+vermin

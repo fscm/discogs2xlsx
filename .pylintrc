@@ -570,6 +570,7 @@ overgeneral-exceptions=BaseException,
 
 
 [PARAMETER_DOCUMENTATION]
+
 # Documentation checker extension
 
 # Whether to accept totally missing parameter documentation in the docstring
