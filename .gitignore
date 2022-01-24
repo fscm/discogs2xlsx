@@ -3,17 +3,24 @@
 *.json
 *.dat
 *.xlsx
+venv/*
 .venv/*
 !.gitkeep
+!.nojekyll
 
 # Python
+.cache
 .coverage
+.coverage.*
+.env
 .mypy_cache/
 .pytest_cache/
 __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info
+*.egg
+target/
 build/
 dist/
 out/

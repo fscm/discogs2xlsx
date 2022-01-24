@@ -7,38 +7,55 @@
 
 """Setup discogs2xlsx."""
 
-#import os
-from setuptools import setup
+from setuptools import find_packages, setup
 from discogs2xlsx import (
     __author__, __license__, __project__, __version__)
+
+
+CLASSIFIERS = [
+    'Development Status :: 4 - Beta',
+    'Environment :: Console',
+    'Intended Audience :: End Users/Desktop',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Topic :: Utilities',
+    'Typing :: Typed']
+DESCRIPTION = 'Exports your Discogs collection or wantlist into a xlsx file.'
+ENTRY_POINTS={
+    'console_scripts': [f'{__project__} = {__project__}.__main__:main']}
+KEYWORDS = ['discogs', 'xlsx']
+PROJECT_URLS = {
+    'Documentation': f'http://fscm.github.io/{__project__}',
+    'Source': f'https://github.com/fscm/{__project__}'}
+PYTHON_REQUIRES = '>=3.9, <4'
+URL = f'https://github.com/fscm/{__project__}'
+
+
+with open('requirements.txt', 'r', encoding='utf-8') as r:
+    DEPENDENCIES = [p.strip() for p in r if not p.strip().startswith('#')]
+
+with open('README.md', 'r', encoding='utf-8') as d:
+    LONG_DESCRIPTION = d.read()
+
 
 if __name__ == '__main__':
     setup(
         author=__author__,
-        classifiers=[
-            'Development Status :: 4 - Beta',
-            'Environment :: Console',
-            'Intended Audience :: End Users/Desktop',
-            'License :: OSI Approved :: MIT License',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python :: 3.8',
-            'Topic :: Utilities',
-            'Typing :: Typed'],
-        description=(
-            'Exports your Discogs collection or wantlist into a xlsx file'),
-        entry_points={
-            'console_scripts': [
-                f'{__project__} = {__project__}.__main__:main']},
-        install_requires=[
-            'progress>=1.5',
-            'requests>=2.25.1',
-            'xlsxwriter>=1.3.7'],
+        classifiers=CLASSIFIERS,
+        description=DESCRIPTION,
+        entry_points=ENTRY_POINTS,
+        install_requires=DEPENDENCIES,
+        keywords=KEYWORDS,
         license=__license__,
-        long_description=open('README.md', 'r', encoding='utf-8').read(),
+        license_files=['LICENSE'],
+        long_description=LONG_DESCRIPTION,
         long_description_content_type='text/markdown',
         name=__project__,
-        packages=[__project__],
-        package_data={'': ['LICENSE'], __project__: ['py.typed', '*.pyi']},
-        python_requires='~=3.8',
-        url='https://github.com/fscm/discogs2xlsx',
+        package_data={__project__: ['py.typed', '*.pyi']},
+        packages=find_packages(exclude=['tests']),
+        project_urls=PROJECT_URLS,
+        python_requires=PYTHON_REQUIRES,
+        url=URL,
         version=__version__)

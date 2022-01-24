@@ -10,7 +10,7 @@ This module allows for data to be writen into xlsx files.
 
 The following is a simple usage example::
 
-  >>> from .xlsx import Xlsx
+  >>> from ._xlsx import Xlsx
   >>> x = Xlsx()
   >>> x.save_collection({}, 'my_collection.xlsx')
 
@@ -22,10 +22,16 @@ All other classes in this module are considered implementation details.
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 from progress.bar import Bar
 import xlsxwriter
-from . import __project__, __version__
+
+
+__all__ = [
+    'Xlsx']
+
+
+Logger = TypeVar('Logger')
 
 
 class Xlsx:
@@ -34,12 +40,25 @@ class Xlsx:
     This class contains methods to write data into xlsx files.
 
     Args:
-      logger (logger.Logger, optional): Logger to use. Defaults to
+      author (str, optional): The document author. Defaults to None.
+      comments (str, optional): Document comments. Defaults to None.
+      logger (_logger.Logger, optional): Logger to use. Defaults to
         None.
     """
 
-    def __init__(self, logger: Optional['Logger'] = None) -> None:
-        self.__logger = logger
+    __slots__ = (
+        '_author',
+        '_comments',
+        '_logger')
+
+    def __init__(
+            self,
+            author: Optional[str] = None,
+            comments: Optional[str] = None,
+            logger: Optional[Logger] = None) -> None:
+        self._author = author
+        self._comments = comments
+        self._logger = logger
 
     def _populate_worksheet(
             self,
@@ -191,8 +210,8 @@ class Xlsx:
                         data[artist][release]['album'],
                         cell_format=worksheet_format_default)
                 worksheet_row += 1
-        if self.__logger:
-            self.__logger.info('Data saved.')
+        if self._logger:
+            self._logger.info('Data saved.')
 
     def save_collection(
             self,
@@ -204,17 +223,20 @@ class Xlsx:
           collection (dict): collection to save.
           to_file (str): file to write to.
         """
-        if self.__logger:
-            self.__logger.info(f'Saving data to "{to_file}".')
+        if self._logger:
+            self._logger.info(f'Saving data to "{to_file}".')
         workbook = xlsxwriter.Workbook(to_file, {'constant_memory': True})
         workbook.set_properties({
             'title': 'Discogs Collection',
-            'subject': f'{collection["username"]} collection',
-            'author': __project__,
+            'subject': f'{collection.get("username", "")} collection',
+            'author': self._author,
             'created': datetime.utcnow().replace(microsecond=0),
-            'comments': f'Created with {__project__} version {__version__}'})
+            'comments': self._comments})
         worksheet = workbook.add_worksheet('collection')
-        self._populate_worksheet(workbook, worksheet, collection['collection'])
+        self._populate_worksheet(
+            workbook,
+            worksheet,
+            collection.get('collection',{} ))
         workbook.close()
 
     def save_wantlist(self, wantlist: dict[str, Any], to_file: str) -> None:
@@ -224,15 +246,18 @@ class Xlsx:
           wantlist (dict): wantlist to save.
           to_file (str): file to write to.
         """
-        if self.__logger:
-            self.__logger.info(f'Saving data to "{to_file}".')
+        if self._logger:
+            self._logger.info(f'Saving data to "{to_file}".')
         workbook = xlsxwriter.Workbook(to_file, {'constant_memory': True})
         workbook.set_properties({
             'title': 'Discogs Wantlist',
-            'subject': f'{wantlist["username"]} wantlist',
-            'author': __project__,
+            'subject': f'{wantlist.get("username", "")} wantlist',
+            'author': self._author,
             'created': datetime.utcnow().replace(microsecond=0),
-            'comments': f'Created with {__project__} version {__version__}'})
+            'comments': self._comments})
         worksheet = workbook.add_worksheet('wantlist')
-        self._populate_worksheet(workbook, worksheet, wantlist['wantlist'])
+        self._populate_worksheet(
+            workbook,
+            worksheet,
+            wantlist.get('wantlist', {}))
         workbook.close()

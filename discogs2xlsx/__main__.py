@@ -12,10 +12,10 @@ document.
 
 import sys
 from . import __author__, __license__, __project__, __version__
-from .discogs import Discogs
-from .logger import Logger
-from .options import Options
-from .xlsx import Xlsx
+from ._discogs import Discogs
+from ._logger import Level, Logger
+from ._options import Options
+from ._xlsx import Xlsx
 
 
 def main() -> None:
@@ -23,31 +23,34 @@ def main() -> None:
     header = (
         f'{__project__} version {__version__}\n'
         f'by {__author__} under {__license__} license')
-    options = Options()
-    # pylint: disable=repeated-keyword
+    options = Options(name=__project__, version=__version__)
     logger = Logger(
-        **({'level': Logger.Level.NONE} if options.all['quiet'] else {}),
-        **({'level': Logger.Level.DEBUG} if options.all['debug'] else {}))
-    # pylint: enable=repeated-keyword
+        name=__project__,
+        **({'level': Level.NONE} if options.all['quiet'] else (
+            {'level': Level.DEBUG} if options.all['debug'] else {})))
     if not options.all['quiet']:
         print(header)
+    print(options.all)
     discogs = Discogs(
-        key=options.all['apikey'],
+        token=options.all['apikey'],
+        user_agent=f'{__project__} version {__version__}',
         currency=options.all['currency'],
         logger=logger)
-    xlsx: Xlsx = Xlsx(logger=logger)
+    xlsx: Xlsx = Xlsx(
+        author=__project__,
+        comments=f'Created with {__project__} version {__version__}',
+        logger=logger)
+    to_file = options.all['file']
     if options.all['wantlist']:
         wantlist = discogs.get_wantlist(
             details=options.all['details'],
             prices=options.all['prices'])
-        xlsx.save_wantlist(wantlist=wantlist, to_file=options.all['file'])
+        xlsx.save_wantlist(wantlist=wantlist, to_file=to_file)
     else:
         collection = discogs.get_collection(
             details=options.all['details'],
             prices=options.all['prices'])
-        xlsx.save_collection(
-            collection=collection,
-            to_file=options.all['file'])
+        xlsx.save_collection(collection=collection, to_file=to_file)
 
 
 if __name__ == '__main__':

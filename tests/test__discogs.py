@@ -8,11 +8,15 @@
 
 # import sys
 # import pytest
-from discogs2xlsx.discogs import Discogs
-from discogs2xlsx.logger import Logger
+from . import __project__
+
+LOGGER = '_logger'
+MODULE = '_discogs'
+logger = __import__(f'{__project__}.{LOGGER}', fromlist=[''])
+discogs = __import__(f'{__project__}.{MODULE}', fromlist=[''])
 
 
-def test_discogs_ok_default(mocker):
+def test__discogs_ok_default(mocker):
     """test_discogs_ok_default
 
     Test if Discogs can be instantiated.
@@ -25,18 +29,15 @@ def test_discogs_ok_default(mocker):
         'username': 'dummy',
         'resource_url': 'https://api.discogs.com/users/dummy',
         'consumer_name': 'dummy'}
-    # mocker.patch(
-    #     'discogs2xlsx.discogs.Discogs._Discogs__request',
-    #     return_value=response)
     mocker.patch(
-        'discogs2xlsx.discogs.Discogs.DiscogsRequests.request',
+        'discogs2xlsx._discogs._DiscogsSession.get',
         return_value=response)
-    d = Discogs(key='dummy')
-    assert isinstance(d, Discogs)
-    assert d._Discogs__identity == response  # pylint: disable=protected-access)
+    d = discogs.Discogs(token='dummy', user_agent=__project__)
+    assert isinstance(d, discogs.Discogs)
+    assert d._identity == response  # pylint: disable=protected-access)
 
 
-def test_discogs_ok_collection(mocker):
+def test__discogs_ok_collection(mocker):
     """test_discogs_ok_default
 
     Test if Discogs can obtain a collection.
@@ -183,22 +184,18 @@ def test_discogs_ok_collection(mocker):
                         'good': '3.86',
                         'fair': '2.58',
                         'poor': '1.29'}}}}}
-    # mocker.patch(
-    #     'discogs2xlsx.discogs.Discogs._Discogs__request',
-    #     side_effect=[
-    #         response_0, response_1, response_2, response_3, response_4])
     mocker.patch(
-        'discogs2xlsx.discogs.Discogs.DiscogsRequests.request',
+        'discogs2xlsx._discogs._DiscogsSession.get',
         side_effect=[
             response_0, response_1, response_2, response_3, response_4])
-    l = Logger(level=Logger.Level.NONE)
-    d = Discogs(key='dummy', logger=l)
+    l = logger.Logger(name=__project__, level=logger.Level.NONE)
+    d = discogs.Discogs(token='dummy', logger=l)
     c = d.get_collection(details=True, prices=True)
-    assert isinstance(d, Discogs)
+    assert isinstance(d, discogs.Discogs)
     assert c == result
 
 
-def test_discogs_ok_wantlist(mocker):
+def test__discogs_ok_wantlist(mocker):
     """test_discogs_ok_default
 
     Test if Discogs can obtain a wantlist.
@@ -343,16 +340,12 @@ def test_discogs_ok_wantlist(mocker):
                         'good': '4.31',
                         'fair': '2.87',
                         'poor': '1.44'}}}}}
-    # mocker.patch(
-    #     'discogs2xlsx.discogs.Discogs._Discogs__request',
-    #     side_effect=[
-    #         response_0, response_1, response_1, response_2, response_3])
     mocker.patch(
-        'discogs2xlsx.discogs.Discogs.DiscogsRequests.request',
+        'discogs2xlsx._discogs._DiscogsSession.get',
         side_effect=[
             response_0, response_1, response_1, response_2, response_3])
-    l = Logger(level=Logger.Level.NONE)
-    d = Discogs(key='dummy', logger=l)
+    l = logger.Logger(name=__project__, level=logger.Level.NONE)
+    d = discogs.Discogs(token='dummy', logger=l)
     w = d.get_wantlist(details=True, prices=True)
-    assert isinstance(d, Discogs)
+    assert isinstance(d, discogs.Discogs)
     assert w == result

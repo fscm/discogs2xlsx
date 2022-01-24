@@ -17,7 +17,7 @@ take hours to perform.
 
 There are a couple of things needed for the tool to work.
 
-Python, version 3.6 or above, needs to be installed on your local computer.
+Python, version 3.9 or above, needs to be installed on your local computer.
 You will also need a Discogs account.
 
 ### Discogs
@@ -35,14 +35,14 @@ required.
 
 ### Python 3.x
 
-Python version 3.8 or above is required for the tool to work. Python setup can
+Python version 3.9 or above is required for the tool to work. Python setup can
 be found [here](https://www.python.org/downloads/).
 
 The following python modules are also required to run the tool:
 
 * progress >= 1.5
 * requests >= 2.25.1
-* xlsxwriter >= 1.3.7
+* xlsxwriter >= 3.0.0
 
 ## Installation
 
@@ -57,26 +57,27 @@ pip3 install discogs2xlsx
 A simple example of how to use this tool:
 
 ```shell
-discogs2xlsx -a my_discogs_secret_token
+discogs2xlsx -t my_discogs_secret_token
 ```
 
 List of all the options:
 
 ```shell
-usage: discogs2xlsx [-h] -a APIKEY [-c {AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}] [--debug] [-d] [-f FILE] [-p] [-q] [-v] [-w]
+usage: discogs2xlsx [-h] [-c [{AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}]] [--debug] [-d] [-f [FILE]] [-p] [-q]
+                    -t [TOKEN] [-v] [-w]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -a APIKEY, --apikey APIKEY
-                        discogs api key (default: None)
-  -c {AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}, --currency {AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}
-                        currency for prices (default: 'EUR')
+  -c [{AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}], --currency [{AUD,BRL,CAD,CHF,EUR,GBP,JPY,MXN,NZD,SEK,USD,ZAR}]
+                        currency for prices (default: EUR)
   --debug               debug mode (default: False)
   -d, --details         exports extra details (default: False)
-  -f FILE, --file FILE  output file name (default:
-                        /Users/fscm/Documents/Projects/Active/discogs2xlsx/discogs-collection.xlsx)
+  -f [FILE], --file [FILE]
+                        output file name (default: discogs-collection.xlsx)
   -p, --prices          exports recommended prices (default: False)
   -q, --quiet           quiet mode (default: False)
+  -t [TOKEN], --token [TOKEN]
+                        discogs token (can also be set usibg the DISCOGS_TOKEN environment variable) (default: None)
   -v, --version         show program's version number and exit
   -w, --wantlist        exports the wantlist instead of the collection (default: False)
 ```
@@ -96,7 +97,7 @@ this project.
 A Virtual Environment can be created using the follow command:
 
 ```shell
-python3 -m venv venv/
+python3 -m venv .venv/
 ```
 
 After creating the Virtual Environment the same will have to be activated, run
